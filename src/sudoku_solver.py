@@ -1,4 +1,5 @@
 import cv2
+import sys
 import numpy as np
 
 MAX_WIDTH_HEIGHT = 800
@@ -12,8 +13,10 @@ def set_max_dimensions(img):
     return img
 
 
-def app():
-    img = cv2.imread('../resources/grids/1.png', cv2.IMREAD_GRAYSCALE)
+def app(argv):
+    default_file = '../resources/grids/1.png'
+    filename = argv[0] if len(argv) > 0 else default_file
+    img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
     img = set_max_dimensions(img)
     cv2.imshow('image', img)
     print('Original Dimensions : ', img.shape)
@@ -22,4 +25,4 @@ def app():
 
 
 if __name__ == "__main__":
-    app()
+    app(sys.argv[1:])

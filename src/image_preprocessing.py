@@ -13,4 +13,6 @@ def set_max_dimensions(img):
 
 def preprocess_image(img):
     img = set_max_dimensions(img)
+
     return img
+
