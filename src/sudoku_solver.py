@@ -14,8 +14,8 @@ def app(argv):
         return -1
 
     print('Original Dimensions:', img.shape)
-    [dst, dstP] = imgpro.preprocess_image(img)
-    cv2.imshow('Source', img)
+    [src, dst, dstP] = imgpro.preprocess_image(img)
+    cv2.imshow('Source', src)
     cv2.imshow("Detected Lines (in red) - Standard Hough Line Transform", dst)
     cv2.imshow("Detected Lines (in red) - Probabilistic Line Transform", dstP)
     cv2.waitKey(0)

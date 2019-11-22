@@ -24,7 +24,7 @@ def preprocess_image(src):
 
     hough_lines(canny_output, cdst, cdstP)
 
-    return [cdst, cdstP]
+    return [src, cdst, cdstP]
 
 
 def hough_lines(canny_output, cdst, cdstP):
