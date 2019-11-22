@@ -1,16 +1,7 @@
 import cv2
 import sys
 import numpy as np
-
-MAX_WIDTH_HEIGHT = 800
-
-
-def set_max_dimensions(img):
-    width = img.shape[1]
-    height = img.shape[0]
-    dim = (min(MAX_WIDTH_HEIGHT, width), min(MAX_WIDTH_HEIGHT, height))
-    img = cv2.resize(img, dim)
-    return img
+import image_preprocessing as imgpro
 
 
 def app(argv):
@@ -23,9 +14,9 @@ def app(argv):
         print('Error opening image: ' + filename)
         return -1
 
-    img = set_max_dimensions(img)
+    print('Original Dimensions:', img.shape)
+    img = imgpro.preprocess_image(img)
     cv2.imshow('image', img)
-    print('Original Dimensions : ', img.shape)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
