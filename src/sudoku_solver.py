@@ -17,6 +17,12 @@ def app(argv):
     default_file = '../resources/grids/1.png'
     filename = argv[0] if len(argv) > 0 else default_file
     img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)
+
+    # Check if image is loaded properly
+    if img is None:
+        print('Error opening image: ' + filename)
+        return -1
+
     img = set_max_dimensions(img)
     cv2.imshow('image', img)
     print('Original Dimensions : ', img.shape)
