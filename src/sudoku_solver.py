@@ -1,6 +1,5 @@
 import cv2
 import sys
-import numpy as np
 import image_preprocessing as imgpro
 
 
@@ -15,8 +14,10 @@ def app(argv):
         return -1
 
     print('Original Dimensions:', img.shape)
-    img = imgpro.preprocess_image(img)
-    cv2.imshow('image', img)
+    [dst, dstP] = imgpro.preprocess_image(img)
+    cv2.imshow('Source', img)
+    cv2.imshow("Detected Lines (in red) - Standard Hough Line Transform", dst)
+    cv2.imshow("Detected Lines (in red) - Probabilistic Line Transform", dstP)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
