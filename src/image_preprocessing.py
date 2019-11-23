@@ -33,7 +33,8 @@ def preprocess_image(src):
 
 def apply_gaussian_blur(src):
     return cv.GaussianBlur(src, (param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize'),
-                                 param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize')), 0)
+                                 param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize')),
+                           param_config.SudokuConfig().Config.getint('Normal', 'GaussianSigmaX'))
 
 
 def hough_lines(canny_output, cdst, cdstP):
