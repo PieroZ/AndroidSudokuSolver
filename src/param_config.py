@@ -17,7 +17,7 @@ class SudokuConfig:
     def __init__(self):
         self.Config = configparser.ConfigParser()
         data_set = self.Config.read('../params.ini')
-        # If none of the named files exist, the ConfigParser instance will contain an empty dataset.
+        # If none of the named files exist, the ConfigParser instance will contain an empty data set.
         if not data_set:
             raise ValueError("Failed to open/find all config files")
 

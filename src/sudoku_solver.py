@@ -10,11 +10,10 @@ def load_config():
 
 
 def setup_logger():
-    logger = logging.getLogger('app_log')
+    logger = logging.getLogger(param_config.SudokuConfig().Config.get('Globals', 'AppLogName'))
     logger.setLevel((param_config.SudokuConfig().Config.getint("Logging",
                                                                param_config.SudokuConfig().Config.get('Normal',
                                                                                                       'LogLevel'))))
-    print(logger.level)
 
 
 def app(argv):
