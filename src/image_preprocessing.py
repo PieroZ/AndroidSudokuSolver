@@ -23,12 +23,16 @@ def preprocess_image(src):
     adaptive_thresholded = apply_adaptive_threshold(blurred)
     highlighted_borders = apply_bitwise_not(adaptive_thresholded)
     repaired_disconnected_parts = repair_disconnected_parts(highlighted_borders)
+
+    outer_box = find_biggest_blob(repaired_disconnected_parts)
+
     if logger.level <= logging.INFO:
         cv.imshow('blurred', blurred)
         cv.imshow('adaptive thresholded', adaptive_thresholded)
     if logger.level <= logging.DEBUG:
         cv.imshow('highlighted_borders', highlighted_borders)
     cv.imshow('repaired_disconnected_parts', repaired_disconnected_parts)
+    cv.imshow('outer_box', outer_box)
 
     canny_output = cv.Canny(src, 50, 200, None, 3)
 
@@ -39,6 +43,49 @@ def preprocess_image(src):
     hough_lines(canny_output, cdst, cdstP)
 
     return [src, cdst, cdstP]
+
+
+def find_biggest_blob(src):
+    """ Biggest thing in the image is assumed to be the puzzle. Hence the biggest blob should be the puzzle
+
+    :param src:
+    :return:
+    """
+    #return src
+    return find_biggest_bounding_box(src)
+
+
+def find_biggest_bounding_box(src):
+    count = 0
+    max = -1
+    max_pt = None
+    # grab the image dimensions
+    h = src.shape[0]
+    w = src.shape[1]
+
+    mask = np.zeros((h + 2, w + 2), np.uint8)
+
+    # loop over the image, pixel by pixel
+    for y in range(0, h):
+        for x in range(0, w):
+            if src[y, x] >= 128:
+                # area = cv.floodFill(src, src(y, x), (0, 0, 64))
+                retval = cv.floodFill(src, mask, (x, y), 64)
+                area = retval[0]
+                if area > max:
+                    max_pt = (x, y)
+                    max = area
+
+    mask = np.zeros((h + 2, w + 2), np.uint8)
+    retval = cv.floodFill(src, mask, max_pt, 255)
+    mask = np.zeros((h + 2, w + 2), np.uint8)
+
+    for y in range(0, h):
+        for x in range(0, w):
+            if src[y, x] == 64 and x is not max_pt[0] and y is not max_pt[1]:
+                retval = cv.floodFill(src, mask, (x, y), 0)
+
+    return retval[1]
 
 
 def apply_gaussian_blur(src):
