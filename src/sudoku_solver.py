@@ -2,14 +2,24 @@ import cv2
 import sys
 import image_preprocessing as imgpro
 import param_config
+import logging
 
 
 def load_config():
     param_config.SudokuConfig()
 
 
+def setup_logger():
+    logger = logging.getLogger('app_log')
+    logger.setLevel((param_config.SudokuConfig().Config.getint("Logging",
+                                                               param_config.SudokuConfig().Config.get('Normal',
+                                                                                                      'LogLevel'))))
+    print(logger.level)
+
+
 def app(argv):
     load_config()
+    setup_logger()
     default_file = '../resources/grids/2.jpg'
     filename = argv[0] if len(argv) > 0 else default_file
     img = cv2.imread(filename, cv2.IMREAD_GRAYSCALE)

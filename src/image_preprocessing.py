@@ -20,9 +20,11 @@ def preprocess_image(src):
     blurred = apply_gaussian_blur(src)
     adaptive_thresholded = apply_adaptive_threshold(blurred)
     highlighted_borders = apply_bitwise_not(adaptive_thresholded)
+    repaired_disconnected_parts = repair_disconnected_parts(highlighted_borders)
     cv.imshow('blurred', blurred)
     cv.imshow('adaptive thresholded', adaptive_thresholded)
-    cv.imshow('highlighted_borders', highlighted_borders)
+    #cv.imshow('highlighted_borders', highlighted_borders)
+    cv.imshow('repaired_disconnected_parts', repaired_disconnected_parts)
 
     canny_output = cv.Canny(src, 50, 200, None, 3)
 
@@ -55,6 +57,20 @@ def apply_bitwise_not(src):
     :return: image with inverted colors
     """
     return cv.bitwise_not(src)
+
+
+def repair_disconnected_parts(src):
+    """ Thresholding operation can disconnect connected pairs like lines.
+    In order to fill up holes threshold might have caused dilate operation is being used.
+
+    :param src:
+    :return dilated image:
+    """
+
+    # cross shaped kernel DilatationKernelSize
+    di_kernel = cv.getStructuringElement(cv.MORPH_CROSS, (3, 3))
+    # print(di_kernel)
+    return cv.dilate(src, di_kernel)
 
 
 def hough_lines(canny_output, cdst, cdstP):
