@@ -8,6 +8,7 @@ verify_ssl = true
 [packages]
 numpy = "*"
 opencv-python = "*"
+configparser = "*"
 
 [requires]
-python_version = "3.7"
+python_version = "3.*"

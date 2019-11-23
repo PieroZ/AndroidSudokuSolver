@@ -1,6 +1,7 @@
 import cv2 as cv
 import numpy as np
 import math
+import param_config
 
 MAX_WIDTH_HEIGHT = 800
 
@@ -16,6 +17,9 @@ def set_max_dimensions(img):
 def preprocess_image(src):
     src = set_max_dimensions(src)
     # edges	=	cv.Canny(	image, threshold1, threshold2[, edges[, apertureSize[, L2gradient]]]	)
+    blurred = apply_gaussian_blur(src)
+    cv.imshow('blurred', blurred)
+
     canny_output = cv.Canny(src, 50, 200, None, 3)
 
     # Copy edges to the images that will display the results in BGR
@@ -25,6 +29,11 @@ def preprocess_image(src):
     hough_lines(canny_output, cdst, cdstP)
 
     return [src, cdst, cdstP]
+
+
+def apply_gaussian_blur(src):
+    return cv.GaussianBlur(src, (param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize'),
+                                 param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize')), 0)
 
 
 def hough_lines(canny_output, cdst, cdstP):
@@ -48,4 +57,3 @@ def hough_lines(canny_output, cdst, cdstP):
         for i in range(0, len(linesP)):
             l = linesP[i][0]
             cv.line(cdstP, (l[0], l[1]), (l[2], l[3]), (0, 0, 255), 3, cv.LINE_AA)
-
