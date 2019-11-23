@@ -18,7 +18,9 @@ def preprocess_image(src):
     src = set_max_dimensions(src)
     # edges	=	cv.Canny(	image, threshold1, threshold2[, edges[, apertureSize[, L2gradient]]]	)
     blurred = apply_gaussian_blur(src)
+    adaptive_thresholded = apply_adaptive_threshold(blurred)
     cv.imshow('blurred', blurred)
+    cv.imshow('adaptive thresholded', adaptive_thresholded)
 
     canny_output = cv.Canny(src, 50, 200, None, 3)
 
@@ -35,6 +37,13 @@ def apply_gaussian_blur(src):
     return cv.GaussianBlur(src, (param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize'),
                                  param_config.SudokuConfig().Config.getint('Normal', 'GaussianKernelSize')),
                            param_config.SudokuConfig().Config.getint('Normal', 'GaussianSigmaX'))
+
+
+def apply_adaptive_threshold(src):
+    return cv.adaptiveThreshold(src, param_config.SudokuConfig().Config.getint('Normal', 'AdaptiveThresholdMaxValue'),
+                                cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,
+                                param_config.SudokuConfig().Config.getint('Normal', 'AdaptiveThresholdWindow'),
+                                param_config.SudokuConfig().Config.getint('Normal', 'AdaptiveSubtractConstant'))
 
 
 def hough_lines(canny_output, cdst, cdstP):
