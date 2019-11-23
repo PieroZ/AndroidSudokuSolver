@@ -19,8 +19,10 @@ def preprocess_image(src):
     # edges	=	cv.Canny(	image, threshold1, threshold2[, edges[, apertureSize[, L2gradient]]]	)
     blurred = apply_gaussian_blur(src)
     adaptive_thresholded = apply_adaptive_threshold(blurred)
+    highlighted_borders = apply_bitwise_not(adaptive_thresholded)
     cv.imshow('blurred', blurred)
     cv.imshow('adaptive thresholded', adaptive_thresholded)
+    cv.imshow('highlighted_borders', highlighted_borders)
 
     canny_output = cv.Canny(src, 50, 200, None, 3)
 
@@ -44,6 +46,15 @@ def apply_adaptive_threshold(src):
                                 cv.ADAPTIVE_THRESH_MEAN_C, cv.THRESH_BINARY,
                                 param_config.SudokuConfig().Config.getint('Normal', 'AdaptiveThresholdWindow'),
                                 param_config.SudokuConfig().Config.getint('Normal', 'AdaptiveSubtractConstant'))
+
+
+def apply_bitwise_not(src):
+    """ Gets blurred and thresholded image and convert its borders to white (along with other noise)
+
+    :param src: Image after gaussian blur and adaptive threshold operations
+    :return: image with inverted colors
+    """
+    return cv.bitwise_not(src)
 
 
 def hough_lines(canny_output, cdst, cdstP):

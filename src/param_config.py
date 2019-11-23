@@ -21,5 +21,4 @@ class SudokuConfig:
         if not data_set:
             raise ValueError("Failed to open/find all config files")
 
-        print(self.Config.sections())
         print('Loading config')
