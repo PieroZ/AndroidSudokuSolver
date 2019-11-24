@@ -27,6 +27,7 @@ def preprocess_image(src):
         cv.imshow('repaired_disconnected_parts', repaired_disconnected_parts)
     outer_box = find_biggest_blob(repaired_disconnected_parts)
     outer_box = erode_outer_grid_lines(outer_box)
+    find_lines_in_outer_box(outer_box)
 
     if logger.level <= logging.INFO:
         cv.imshow('blurred', blurred)
@@ -41,9 +42,53 @@ def preprocess_image(src):
     cdst = cv.cvtColor(canny_output, cv.COLOR_GRAY2BGR)
     cdstP = np.copy(cdst)
 
-    hough_lines(canny_output, cdst, cdstP)
+    # hough_lines(canny_output, cdst, cdstP)
 
     return [src, cdst, cdstP]
+
+
+def find_lines_in_outer_box(src):
+    lines = cv.HoughLines(src, 1, np.pi / 180,
+                          param_config.SudokuConfig().Config.getint('Normal', 'HoughLinesThreshold'))
+    draw_lines(src, lines)
+
+
+def draw_lines(src, lines):
+    """ Draw lines using polar system representation, as described in:
+    https://docs.opencv.org/2.4/doc/tutorials/imgproc/imgtrans/hough_lines/hough_lines.html
+
+    :param src:
+    :param lines:
+    :return:
+    """
+    if lines is not None:
+        for i in range(0, len(lines)):
+            #if lines[i][0][1] is not 0.0:
+            if not math.isclose(lines[i][0][1], 0.0, abs_tol=0.00001):
+                m = -1 / np.tan(lines[i][0][1])
+                c = lines[i][0][0] / np.sin(lines[i][0][1])
+
+                cv.line(src, (0, c), (src.shape[0], int(m * src.shape[0] + c)), (127, 127, 127))
+            else:
+                cv.line(src, (lines[i][0][0], 0), (lines[i][0][0], int(src.shape[1])), (0, 0, 255))
+
+
+            # rho = lines[i][0][0]
+            # theta = lines[i][0][1]
+            #
+            # print(m, c, rho, theta)
+
+    # if lines is not None:
+    #     for i in range(0, len(lines)):
+    #         rho = lines[i][0][0]
+    #         theta = lines[i][0][1]
+    #         a = math.cos(theta)
+    #         b = math.sin(theta)
+    #         x0 = a * rho
+    #         y0 = b * rho
+    #         pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
+    #         pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+    #         cv.line(src, pt1, pt2, (0, 0, 255))
 
 
 def find_biggest_blob(src):
