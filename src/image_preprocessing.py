@@ -17,21 +17,22 @@ def set_max_dimensions(img):
 
 def preprocess_image(src):
     logger = logging.getLogger(param_config.SudokuConfig().Config.get('Globals', 'AppLogName'))
-    src = set_max_dimensions(src)
+    # src = set_max_dimensions(src)
     # edges	=	cv.Canny(	image, threshold1, threshold2[, edges[, apertureSize[, L2gradient]]]	)
     blurred = apply_gaussian_blur(src)
     adaptive_thresholded = apply_adaptive_threshold(blurred)
     highlighted_borders = apply_bitwise_not(adaptive_thresholded)
     repaired_disconnected_parts = repair_disconnected_parts(highlighted_borders)
-
+    if logger.level <= logging.INFO:
+        cv.imshow('repaired_disconnected_parts', repaired_disconnected_parts)
     outer_box = find_biggest_blob(repaired_disconnected_parts)
+    outer_box = erode_outer_grid_lines(outer_box)
 
     if logger.level <= logging.INFO:
         cv.imshow('blurred', blurred)
         cv.imshow('adaptive thresholded', adaptive_thresholded)
     if logger.level <= logging.DEBUG:
         cv.imshow('highlighted_borders', highlighted_borders)
-    cv.imshow('repaired_disconnected_parts', repaired_disconnected_parts)
     cv.imshow('outer_box', outer_box)
 
     canny_output = cv.Canny(src, 50, 200, None, 3)
@@ -51,17 +52,17 @@ def find_biggest_blob(src):
     :param src:
     :return:
     """
-    #return src
+    # return src
     return find_biggest_bounding_box(src)
 
 
 def find_biggest_bounding_box(src):
-    count = 0
     max = -1
     max_pt = None
     # grab the image dimensions
-    h = src.shape[0]
-    w = src.shape[1]
+    # h = src.shape[0]
+    # w = src.shape[1]
+    h, w = src.shape[:2]
 
     mask = np.zeros((h + 2, w + 2), np.uint8)
 
@@ -122,6 +123,11 @@ def repair_disconnected_parts(src):
     di_kernel = cv.getStructuringElement(cv.MORPH_CROSS, (3, 3))
     # print(di_kernel)
     return cv.dilate(src, di_kernel)
+
+
+def erode_outer_grid_lines(src):
+    er_kernel = cv.getStructuringElement(cv.MORPH_CROSS, (3, 3))
+    return cv.erode(src, er_kernel)
 
 
 def hough_lines(canny_output, cdst, cdstP):
